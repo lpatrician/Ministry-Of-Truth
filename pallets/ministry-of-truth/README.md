@@ -21,6 +21,7 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 6. Others in the scientific community, that are validated members in the `council` instance of the *Collective* pallet can cast votes on these articles.
 7. These members can now participate in the claims-voting step in the process. They can identify an objective claim statement for a claim made by the article, and put it to vote by using the Claims UI. This part of the UI contains a form that raises a motion in the *Collective* pallet that proposes calling the Ministry of Truth's *store_claim* extrinsic with: their objective claim statement, and the article ID the claim was discovered in.
 8. Other members can vote aye/nay on such claims. Aye = credible claim. Nay = credible claim, or not objective statement. In the future, claims will further be split into voting steps of: 1. determining whether claims are objective, and b. determining whether claims are true. This can be split between different instances of collective, with randomized members.
+9. Following the close of a voting period for claims on an article, a score is given to the article, based on the claims made on the article. 
 
 ## Interacting with the Pallet ##
 1. Build the node `cargo build --release`
@@ -43,13 +44,4 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 3. Fix BadOrigin error when using `ministry-of-truth` extrinsics from the `Collective` `propose` extrinsic.
 4. Split claims extrinsic into two: one for voting on whether such claim was made in an article, and another for voting on claim veracity of verified objective claims. It would likely reduce bias if multiple different groups could vote on a. The claims made in the article, and b. whether those claims are accepted/rejected.
 5. Add additional collective instances. Add code to randmize members of collective instances to ensure roles are rotated. 
-6. Find way to implement article uuid identifiers. E.G.
-	/// Article source identifier 
-	// enum SourceId {
-	// 	ISBN,
-	// 	DOI,
-	// 	ISSN,
-	// 	PMID,
-	// 	SICI
-	// }
 6.Handle unused result in store_claim_for_article extrinsic

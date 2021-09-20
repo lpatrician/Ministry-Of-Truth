@@ -24,7 +24,7 @@ fn it_stores_claims() {
 		assert_eq!(MinistryOfTruth::next_claim_id(), 1);
 		assert_eq!(
 			MinistryOfTruth::get_claims(0, 0),
-			Claim { claim_text_cid: [2, 3].to_vec(), is_rejected: false }
+			Claim { claim_text_cid: [1, 2].to_vec(), is_rejected: false }
 		);
 	});
 }

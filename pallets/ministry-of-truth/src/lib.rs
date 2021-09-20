@@ -1,8 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
-/// <https://substrate.dev/docs/en/knowledgebase/runtime/frame>
 pub use pallet::*;
 
 pub use pallet_collective;
@@ -27,13 +24,14 @@ pub mod pallet {
 
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One, Zero};
 
-	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		/// Id of Articles stored in the system
 		type ArticleId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
 	}
 
+	/// Id of claims made in the system. 
 	type ClaimId = u32;
 
 	#[pallet::pallet]
@@ -92,6 +90,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ArticleStored(T::ArticleId),
 		ClaimStored(ClaimId),
+		CouldNotRetrieveArticle
 	}
 
 	// Errors inform users that something went wrong.
@@ -106,6 +105,13 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		/// Stores an article in the system for voting. 
+		///
+		/// # Arguments
+		///
+		/// * `origin` - Origin of the request
+		/// * `source_id` - Unique identifier, or DOI of the article
+		/// * `url` - Url of the article. Displayed for the purpose of allowing voters to find and read the content.
 		pub fn store_article(
 			origin: OriginFor<T>,
 			source_id: Vec<u8>,
@@ -128,13 +134,14 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		/// Stores a claim for a given article. This should be called by the colletive propose extrinsic
+		/// Stores a claim for a given article. This should be called by the collective propose extrinsic
 		///
 		/// # Arguments
 		///
 		/// * `origin` - Origin of the request
-		/// * `source_id` - Unique identifier, or DOI of the article
 		/// * `claim_statement` - IPFS CID of a stored string that contains an objective claim. This claim will be voted on for veracity.
+		/// * `article_id` - Id of an article which contained the given claim
+		/// * `is_rejected` - Designates whether the claim is non-credible, or credible
 		pub fn store_claim_for_article(
 			origin: OriginFor<T>,
 			claim_statement: Vec<u8>,
@@ -162,15 +169,13 @@ pub mod pallet {
 
 			ArticleStorage::<T>::try_mutate_exists(article_id.clone(), |val| -> DispatchResult {
 				// add claim id to article for future reference
-				let article_result = val.as_mut().ok_or(Error::<T>::NonExistentArticle);
-				match article_result {
-					Ok(article) => {
-						article.claims.push(new_claim_id);
-						Self::deposit_event(Event::ClaimStored(new_claim_id));
-					}
-					Err(_) => {} // Handle error...
-				}
+				let article = val
+					.as_mut()
+					.ok_or(Error::<T>::NonExistentArticle)
+					.unwrap();
 
+				article.claims.push(new_claim_id);
+				Self::deposit_event(Event::ClaimStored(new_claim_id));
 				Ok(())
 			});
 
