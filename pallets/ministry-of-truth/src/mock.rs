@@ -8,9 +8,6 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 };
 
-// pub const article = hex!("hi");
-// pub const source_id = hex!("test");
-
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
