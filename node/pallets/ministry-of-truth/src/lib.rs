@@ -1,8 +1,4 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
-/// <https://substrate.dev/docs/en/knowledgebase/runtime/frame>
 pub use pallet::*;
 
 pub use pallet_collective;
@@ -42,7 +38,6 @@ pub mod pallet {
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
 	pub struct ProposedArticle {
-		// author: AuthorId
 		/// The URL designated for accessing the Article text content.
 		url: Vec<u8>,
 		/// Ids of claims raised in the article
@@ -99,8 +94,7 @@ pub mod pallet {
 	pub enum Error<T> {
 		NoAvailableArticleId,
 		NoAvailableClaimId,
-		NonExistentArticle,
-		Unknown,
+		NonExistentArticle
 	}
 
 	#[pallet::call]
@@ -121,7 +115,9 @@ pub mod pallet {
 				})?;
 
 			let article = ProposedArticle { url, claims: [].to_vec(), source_id };
+
 			ArticleStorage::<T>::insert(class_id.clone(), article);
+
 			Self::deposit_event(Event::ArticleStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
@@ -141,9 +137,8 @@ pub mod pallet {
 			article_id: T::ArticleId,
 			is_rejected: bool,
 		) -> DispatchResult {
-			// TODO: Find way to ensure this was called by the `propose` extrinsic.
 			ensure_signed(origin)?;
-			// Ensure that the article exists
+			// Ensure Article exists.
 			ensure!(ArticleStorage::<T>::contains_key(article_id), Error::<T>::NonExistentArticle);
 
 			let new_claim_id =
@@ -162,10 +157,13 @@ pub mod pallet {
 
 			ArticleStorage::<T>::try_mutate_exists(article_id.clone(), |val| -> DispatchResult {
 				// add claim id to article for future reference
-				let article_result = val.as_mut().ok_or(Error::<T>::NonExistentArticle);
-				match article_result {
-					Ok(article) => {
-						article.claims.push(new_claim_id);
+				let f = val.as_mut().ok_or(Error::<T>::NonExistentArticle);
+				// val.claims.push((key, source_id.clone()))
+
+				// f.claims.push((key, article_id));
+				match f {
+					Ok(res) => {
+						res.claims.push(new_claim_id);
 						Self::deposit_event(Event::ClaimStored(new_claim_id));
 					}
 					Err(_) => {} // Handle error...
@@ -173,7 +171,6 @@ pub mod pallet {
 
 				Ok(())
 			});
-
 			Self::deposit_event(Event::ClaimStored(new_claim_id));
 			Ok(())
 		}

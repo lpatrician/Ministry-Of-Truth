@@ -14,7 +14,7 @@ use frame_system::RawOrigin;
 // 	use crate::{*, Module as PalletModule};
 // 	use frame_benchmarking::{benchmarks, account, impl_benchmark_test_suite};
 // 	use frame_system::RawOrigin;
-  
+
 // 	benchmarks! {
 // 		store_article {
 // 			let s in 0 .. 100;

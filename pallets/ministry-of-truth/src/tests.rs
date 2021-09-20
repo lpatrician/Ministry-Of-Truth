@@ -29,13 +29,12 @@ fn it_stores_claims() {
 			false
 		));
 		assert_eq!(MinistryOfTruth::next_claim_id(), 1);
-		
-		// assert_ok!(MinistryOfTruth::get_claims(0, 0), 1);
-		assert_eq!(MinistryOfTruth::get_claims(0, 0), Claim {
-			claim_text_cid: [2, 3].to_vec(),
-			is_rejected: false
-		});
 
+		// assert_ok!(MinistryOfTruth::get_claims(0, 0), 1);
+		assert_eq!(
+			MinistryOfTruth::get_claims(0, 0),
+			Claim { claim_text_cid: [2, 3].to_vec(), is_rejected: false }
+		);
 	});
 }
 
