@@ -60,6 +60,10 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 6. Assign score to articles based on accepted/rejected claims on the article.
 7. Store an `article` vec on `Claims` to provide a many-to-many relationship of claims to articles. This would make more sense than the current relationship as one claim can appear in multiple articles. A step to de-dupe claims by users would need to be implemented with such a relationship.
 8. Provide an additional field to denote a news-facing claim. An easily understandable, agreed-upon, outward-facing claim containing limited jargon to help communicate results to media or laymen readers. This is essentially an agreed-upon interpretation of the results.
+9. Provide a better model for incentivizing users to participate in the system. Requiring payment from SME users(anyone executing pallets) who are doing valuable work may not be sustainable. It may be worth exploring whether users are incentivised to submit an article, and requiring more up front payment from them to fund the process.
 
 #### Why might this be useful? ####
 In addition to the improvements noted by the author, a solution focused on accumulating some amount of primary information on-chain could serve as a foundation for solutions to other issues in misinformation and identity. For example, a solution similar to the one posed here, though focused on second or third degree sources of information such as news articles and tweets could implement some sort of reference system based on the first degree sources of information. Credibility can be tracked according to author, and or publisher. 
+
+#### FAQ ####
+1. How would fees be covered? 
