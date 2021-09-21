@@ -1,9 +1,9 @@
 # Ministry of Truth 🏢 #
 
-### A pallet for private blockchains focused on interpretability and consensus of claims made in the scientific community, and misinformation solution foundations. ###
+### A pallet for private blockchains focused on interpretability and consensus of claims made in the scientific community ###
 
 #### What is this? ####
-This pallet attempts to implement the consensus solution described in the paper [*The use of distributed consensus algorithms to curtail the spread of medical misinformation*](https://www.ijam-web.org/article.asp?issn=2455-5568;year=2019;volume=5;issue=2;spage=93;epage=99;aulast=Plaza). The paper lays out a hypothetical case for a private blockchain solution to reduce groupthink, and improve the consensus-gathering of the scientific process, as well as improve the interpretability of the scientific results. The authors of the paper give several examples of cases where such a system may have countered the spread of medical misinformation. One example is the anti-vaccination movement in the 1990's following the publication of a paper which was widely regarded as faulty by the scientific community.
+This pallet attempts to implement the consensus solution described in the paper [*The use of distributed consensus algorithms to curtail the spread of medical misinformation*](https://www.ijam-web.org/article.asp?issn=2455-5568;year=2019;volume=5;issue=2;spage=93;epage=99;aulast=Plaza). The paper lays out a hypothetical case for a private blockchain solution to reduce groupthink, and improve the consensus-gathering of the scientific process, as well as improve the interpretability of the scientific results. The described solution would accomplish this goal by providing anonymity to verified members of the scientific community, and allow them to vote on the claims made in scientific papers. The authors of the paper give several examples of cases where such a system may have countered the spread of medical misinformation. One example is the anti-vaccination movement in the 1990's following the publication of a paper which was widely regarded as faulty by the scientific community.
 
 #### What does the name mean? ####
 The name of the pallet is inspired by the [propaganda arm of the government in the science-fiction novel *1984*](https://en.wikipedia.org/wiki/Ministries_of_Nineteen_Eighty-Four#Ministry_of_Truth), that serves to determine what information is true. The name is just a silly reference and has nothing to do with the function of the pallet.
@@ -33,7 +33,9 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 3. Provide a mechanism for agreeing on public-facing study results
 4. Provide a reference point for first-degree sources of information
 5. Provide a foundation for developing other misinformation solutions based on non-first degress information sources
-6. Provide a database of publicly-agreed, disproven claims
+6. Provide a database of publicly-agreed upon, disproven claims
+7. Increase speed and efficiency of communication between scientists
+8. Improve scientists' access to Scientific Consensus(SCS) infrastructure
 ## Interacting with the Pallet ##
 1. Build the node `cargo build --release`
 2. Run the dev chain locally `./target/release/node-template --dev --tmp`

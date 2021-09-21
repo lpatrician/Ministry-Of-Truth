@@ -2,8 +2,6 @@
 
 pub use pallet::*;
 
-pub use pallet_collective;
-
 #[cfg(test)]
 mod mock;
 
@@ -21,7 +19,6 @@ pub mod pallet {
 	};
 	use frame_system::pallet_prelude::*;
 	use sp_std::vec::Vec;
-
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One, Zero};
 
 	#[pallet::config]
@@ -64,17 +61,17 @@ pub mod pallet {
 	pub type NextClaimId<T: Config> = StorageValue<_, ClaimId, ValueQuery>;
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
-	/// Claims made in scientific articles. Proposers can introduce claims as accepted or rejected to reflect the truthfullness of the content.
+	/// Claims made in scientific articles. Proposers can introduce claims as accepted or rejected to reflect the veracity of the content.
 	pub struct Claim {
 		/// the IPFS CID of the text that contains the objective claim statement.
 		pub claim_text_cid: Vec<u8>,
-		/// Whether the claim is determined to be accepted or rejected by the council. We'll use a negative for the boolean due to science's focus on falsifying ideas.
+		/// Whether the claim is determined to be accepted or rejected by the Collective instance. We'll use a negative for the boolean due to science's focus on falsifying ideas.
 		pub is_rejected: bool,
 	}
 
 	#[pallet::storage]
 	#[pallet::getter(fn get_claims)]
-	/// Double Storage map to map claims to the articles they were discovered on
+	/// Double Storage map that maps claims to the articles they originated from
 	pub type ClaimsToArticles<T: Config> = StorageDoubleMap<
 		_,
 		Blake2_128Concat,
@@ -93,19 +90,17 @@ pub mod pallet {
 		ClaimStored(ClaimId),
 	}
 
-	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
 		NoAvailableArticleId,
 		NoAvailableClaimId,
-		NonExistentArticle,
-		Unknown,
+		NonExistentArticle
 	}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		/// Stores an article in the system for deliberation on its claims.
+		/// Stores an article in the system to initiate the claims-voting process
 		///
 		/// # Arguments
 		///
@@ -118,7 +113,6 @@ pub mod pallet {
 			url: Vec<u8>,
 		) -> DispatchResult {
 			ensure_signed(origin)?;
-			// get id
 			let class_id =
 				NextArticleId::<T>::try_mutate(|id| -> Result<T::ArticleId, DispatchError> {
 					let current_id = *id;
@@ -170,7 +164,6 @@ pub mod pallet {
 			ArticleStorage::<T>::try_mutate_exists(article_id.clone(), |val| -> DispatchResult {
 				// add claim id to article for future reference
 				let article = val.as_mut().ok_or(Error::<T>::NonExistentArticle).unwrap();
-
 				article.claims.push(new_claim_id);
 				Self::deposit_event(Event::ClaimStored(new_claim_id));
 				Ok(())
