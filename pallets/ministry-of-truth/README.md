@@ -1,6 +1,6 @@
-# Ministry of Truth #
+# Ministry of Truth 🏢 #
 
-### A pallet focused on interpretability and consensus of claims made in the scientific community. ###
+### A pallet for private blockchains focused on interpretability and consensus of claims made in the scientific community, and misinformation solution foundations. ###
 
 #### What is this? ####
 This pallet attempts to implement the consensus solution described in the paper [*The use of distributed consensus algorithms to curtail the spread of medical misinformation*](https://www.ijam-web.org/article.asp?issn=2455-5568;year=2019;volume=5;issue=2;spage=93;epage=99;aulast=Plaza). The paper lays out a hypothetical case for a private blockchain solution to reduce groupthink, and improve the consensus-gathering of the scientific process, as well as improve the interpretability of the scientific results. The authors of the paper give several examples of cases where such a system may have countered the spread of medical misinformation. One example is the anti-vaccination movement in the 1990's following the publication of a paper which was widely regarded as faulty by the scientific community.
@@ -26,6 +26,14 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 7. Other members can vote aye/nay on such claims. Aye = accepted objective claim. Nay = non-credible OR subjective claim. In the future, claims will further be split into two steps: 1. determining whether claims are objective, and 2. determining whether claims are true. This can be further split between different instances of collective, with randomized members.
 8. Following the close of a voting period for claims on an article, a score is given to the article, based on the ratio of accepted/rejected claims.
 
+
+#### Goals #### 
+1. Provide a decentralized tool for improving scientific community consensus
+2. Allow for scientific community member verification and anonymity
+3. Provide a mechanism for agreeing on public-facing study results
+4. Provide a reference point for first-degree sources of information
+5. Provide a foundation for developing other misinformation solutions based on non-first degress information sources
+6. Provide a database of publicly-agreed, disproven claims
 ## Interacting with the Pallet ##
 1. Build the node `cargo build --release`
 2. Run the dev chain locally `./target/release/node-template --dev --tmp`

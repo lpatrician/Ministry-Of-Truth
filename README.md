@@ -1,4 +1,4 @@
-# MOT Node #
+# MOT Node  🏢 #
 
 ## Background ##
 This houses the MOT pallet. For more background on the project, see `pallets/ministry-of-truth/README.md`
