@@ -8,10 +8,17 @@ This pallet is inspired by the paper titled [*The use of distributed consensus a
 #### What does the name mean? ####
 The name of the pallet is inspired by the [propaganda arm of the government in *1984*](https://en.wikipedia.org/wiki/Ministries_of_Nineteen_Eighty-Four#Ministry_of_Truth), that serves to determine what information is true. It's just a silly reference and has nothing to do with the function of the pallet
 
-#### How would it work? ####
+#### Working with Collective ####
+This pallet is written with the understanding that it lives alongside the [`Collective` Pallet](https://substrate.dev/rustdocs/latest/pallet_collective/index.html). It is expected that the extrinsics in the MOT pallet would be proposed through the `Collective propose` extrinsic, and not run directly by users. 
+
+#### Context for the System ####
+
+
 The pallet should follow the author's guidance regarding behavior and voting. It should facilitate steps in the scientific process. In this case, the step to facilitate is a post-publish peer review step. The author recommends in the paper that a private blockchain consisting of anonymized node operators who are members of the scientific community be implemented. Ostensibly, this is to reduce groupthink in voting. A similar reduction in bias might be achieved if the pallet is split into multiple voting steps, and different instances of `Collective` consisting of randomized participants are used in voting. 
 
- In this case, the step followed will be a post-publish peer-review. In this stage of development, it should be used for papers pre or post-publish that are accesible through a URL. The usage of the system can be described through the following flow:
+In this stage of development, it should be used for papers pre or post-publish that are accesible through a URL.
+#### How would it be used? ####
+ The usage of the system can be described through the following flow:
 
 1. The user enters the app UI(imagine in this case we have built a UI form specifically for this pallet).
 2. The user enters their article url into the form and submits it.
@@ -36,7 +43,7 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 		1. Choose the `storeClaimForArticle` extrinsic of the `ministryOfTruth` pallet.(In real-world use, users would see proposed articles and would suggest and suggest claims for the article through the `propose` extrinsic of the `Collective` pallet)
 		2. Provide hex values for the claim statement(objective text of the claim that the user has identified), article id(refers to an article id you got from the previous step), and `isRejected`(whether the claim is credible, or non-credible.)
 		3. Submit the transaction
-	3. In a real-world case, this is where users would gather and vote on the motions of whether to store the claims as "accepted" objective claims.
+	Note: In a real-world case, this is where users would gather and vote on the motions of whether to store the claims as "accepted" objective claims.
 
 #### Fixes/Improvements/TODO ####
 1. Add extrinsics that call the `Collective` `propose` extrinsic with the `Call` of the expected article/claim contents. This would make the experience more guided and rely less on the frontend code to provide an exact call to the Collective extrinsics. 
@@ -44,4 +51,6 @@ The pallet should follow the author's guidance regarding behavior and voting. It
 3. Fix BadOrigin error when using `ministry-of-truth` extrinsics from the `Collective` `propose` extrinsic.
 4. Split claims extrinsic into two: one for voting on whether such claim was made in an article, and another for voting on claim veracity of verified objective claims. It would likely reduce bias if multiple different groups could vote on a. The claims made in the article, and b. whether those claims are accepted/rejected.
 5. Add additional collective instances. Add code to randmize members of collective instances to ensure roles are rotated. 
-6.Handle unused result in store_claim_for_article extrinsic
+6. Assign score to articles based on accepted/rejected claims on the article.
+#### Why might this be useful? ####
+In addition to the improvements noted by the author, a solution focused on accumulating some amount of primary information on-chain could serve as a foundation for solutions to other issues in misinformation and identity. For example, a solution similar to the one posed here, though focused on second or third degree sources of information such as news articles and tweets could implement some sort of reference system based on the first degree sources of information. Credibility can be tracked according to author, and or publisher. 

@@ -1,7 +1,7 @@
 # MOT Node #
 
 ## Background ##
-For more background on the project, see `pallets/ministry-of-truth/README.md`
+This houses the MOT pallet. For more background on the project, see `pallets/ministry-of-truth/README.md`
 
 ## Development ##
 To build the project, run:
