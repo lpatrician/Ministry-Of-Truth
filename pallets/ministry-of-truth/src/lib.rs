@@ -31,7 +31,7 @@ pub mod pallet {
 		type ArticleId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
 	}
 
-	/// Id of claims made in the system. 
+	/// Id of claims made in the system.
 	type ClaimId = u32;
 
 	#[pallet::pallet]
@@ -39,20 +39,20 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
-	pub struct ProposedArticle {
-		// author: AuthorId
-		/// The URL designated for accessing the Article text content.
+	/// Represents an article in the system.
+	pub struct Article {
+		/// The URL designated for accessing the Article text content
 		url: Vec<u8>,
-		/// Ids of claims raised in the article
+		/// u32s representing ids of any Claims raised in the article
 		claims: Vec<u32>,
-		/// The originating id of the source
+		/// The id of the article in its source system, e.g. DOI
 		source_id: Vec<u8>,
 	}
 
 	#[pallet::storage]
 	#[pallet::getter(fn get_article)]
 	pub type ArticleStorage<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::ArticleId, ProposedArticle, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, T::ArticleId, Article, ValueQuery>;
 
 	/// Next available class ID.
 	#[pallet::storage]
@@ -64,10 +64,11 @@ pub mod pallet {
 	pub type NextClaimId<T: Config> = StorageValue<_, ClaimId, ValueQuery>;
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
+	/// Claims made in scientific articles. Proposers can introduce claims as accepted or rejected to reflect the truthfullness of the content.
 	pub struct Claim {
 		/// the IPFS CID of the text that contains the objective claim statement.
 		pub claim_text_cid: Vec<u8>,
-		/// Whether the claim is determined to be credible or non-credible. We'll use a negative for the boolean due to science's focus on falsifying ideas.
+		/// Whether the claim is determined to be accepted or rejected by the council. We'll use a negative for the boolean due to science's focus on falsifying ideas.
 		pub is_rejected: bool,
 	}
 
@@ -90,7 +91,6 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ArticleStored(T::ArticleId),
 		ClaimStored(ClaimId),
-		CouldNotRetrieveArticle
 	}
 
 	// Errors inform users that something went wrong.
@@ -105,12 +105,12 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		/// Stores an article in the system for voting. 
+		/// Stores an article in the system for deliberation on its claims.
 		///
 		/// # Arguments
 		///
-		/// * `origin` - Origin of the request
-		/// * `source_id` - Unique identifier, or DOI of the article
+		/// * `origin` - Origin of the request.
+		/// * `source_id` - Unique identifier, or DOI of the article.
 		/// * `url` - Url of the article. Displayed for the purpose of allowing voters to find and read the content.
 		pub fn store_article(
 			origin: OriginFor<T>,
@@ -126,7 +126,7 @@ pub mod pallet {
 					Ok(current_id)
 				})?;
 
-			let article = ProposedArticle { url, claims: [].to_vec(), source_id };
+			let article = Article { url, claims: [].to_vec(), source_id };
 			ArticleStorage::<T>::insert(class_id.clone(), article);
 			Self::deposit_event(Event::ArticleStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
@@ -134,21 +134,21 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		/// Stores a claim for a given article. This should be called by the collective propose extrinsic
+		/// Stores a claim for a given article. This should be called by the collective propose extrinsic.
 		///
 		/// # Arguments
 		///
 		/// * `origin` - Origin of the request
 		/// * `claim_statement` - IPFS CID of a stored string that contains an objective claim. This claim will be voted on for veracity.
-		/// * `article_id` - Id of an article which contained the given claim
-		/// * `is_rejected` - Designates whether the claim is non-credible, or credible
+		/// * `article_id` - Id of an article the claim was discovered in.
+		/// * `is_rejected` - Designates whether the claim is rejected, or accepted by the council.
 		pub fn store_claim_for_article(
 			origin: OriginFor<T>,
 			claim_statement: Vec<u8>,
 			article_id: T::ArticleId,
 			is_rejected: bool,
 		) -> DispatchResult {
-			// TODO: Find way to ensure this was called by the `propose` extrinsic.
+			// TODO: Find way to ensure this was called by the `propose` extrinsic. This fails with BadOrigin when called by the `propose` pallet.
 			ensure_signed(origin)?;
 			// Ensure that the article exists
 			ensure!(ArticleStorage::<T>::contains_key(article_id), Error::<T>::NonExistentArticle);
@@ -169,10 +169,7 @@ pub mod pallet {
 
 			ArticleStorage::<T>::try_mutate_exists(article_id.clone(), |val| -> DispatchResult {
 				// add claim id to article for future reference
-				let article = val
-					.as_mut()
-					.ok_or(Error::<T>::NonExistentArticle)
-					.unwrap();
+				let article = val.as_mut().ok_or(Error::<T>::NonExistentArticle).unwrap();
 
 				article.claims.push(new_claim_id);
 				Self::deposit_event(Event::ClaimStored(new_claim_id));
