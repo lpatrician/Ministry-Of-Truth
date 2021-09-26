@@ -1,7 +1,7 @@
 # MOT Node  🏢 #
 
 ## Background ##
-This houses the MOT pallet. For more background on the project, see `pallets/ministry-of-truth/README.md`
+This houses the MOT pallet. For more background on the project, see `pallets/publicafides/README.md`
 
 ## Development ##
 To build the project, run:
@@ -25,4 +25,4 @@ cargo test
 
 #### TODO ####
 - Finish benchmarking and finalize weights.
-- TODOs for ministry-of-truth pallet
+- TODOs for publicafides pallet

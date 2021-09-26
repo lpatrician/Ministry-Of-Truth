@@ -43,7 +43,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
-pub use ministry_of_truth;
+pub use publicafides;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -287,15 +287,14 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
 }
 
-/// Configure the ministry-of-truth in pallets/template.
-impl ministry_of_truth::Config for Runtime {
+/// Configure the publicafides in pallets/template.
+impl publicafides::Config for Runtime {
 	type Event = Event;
-	// type ClaimId = u32;
-	type ArticleId = u32;
+	type ContentId = u32;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
-construct_runtime!(
+construct_runtime! {
 	pub enum Runtime where
 		Block = Block,
 		NodeBlock = opaque::Block,
@@ -309,11 +308,11 @@ construct_runtime!(
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-		// Include the custom logic from the ministry-of-truth in the runtime.
-		MinistryOfTruth: ministry_of_truth::{Pallet, Call, Storage, Event<T>},
+		// Include the custom logic from the publicafides in the runtime.
+		PublicaFides: publicafides::{Pallet, Call, Storage, Event<T>},
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>}
 	}
-);
+}
 
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
@@ -488,7 +487,7 @@ impl_runtime_apis! {
 			list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
 			list_benchmark!(list, extra, pallet_balances, Balances);
 			list_benchmark!(list, extra, pallet_timestamp, Timestamp);
-			list_benchmark!(list, extra, ministry_of_truth, MinistryOfTruth);
+			list_benchmark!(list, extra, publicafides, publicafides);
 
 			let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -522,7 +521,7 @@ impl_runtime_apis! {
 			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
 			add_benchmark!(params, batches, pallet_balances, Balances);
 			add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-			add_benchmark!(params, batches, ministry_of_truth, MinistryOfTruth);
+			add_benchmark!(params, batches, publicafides, publicafides);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)

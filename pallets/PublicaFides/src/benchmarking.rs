@@ -33,4 +33,4 @@ use frame_system::RawOrigin;
 // 	}
 // }
 
-impl_benchmark_test_suite!(MinistryOfTruth, crate::mock::new_test_ext(), crate::mock::Test);
+impl_benchmark_test_suite!(PublicaFides, crate::mock::new_test_ext(), crate::mock::Test);
