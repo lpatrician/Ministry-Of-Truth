@@ -287,6 +287,25 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
 }
 
+parameter_types! {
+	pub const PanelMotionDuration: BlockNumber = 5 * DAYS;
+	pub const PanelMaxProposals: u32 = 200;
+	pub const PanelMaxMembers: u32 = 50;
+}
+
+type PanelCollective = pallet_collective::Instance2;
+
+impl pallet_collective::Config<PanelCollective> for Runtime {
+	type Origin = Origin;
+	type Proposal = Call;
+	type Event = Event;
+	type MotionDuration = PanelMotionDuration;
+	type MaxProposals = PanelMaxProposals;
+	type MaxMembers = PanelMaxMembers;
+	type DefaultVote = pallet_collective::PrimeDefaultVote;
+	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
+}
+
 /// Configure the publicafides in pallets/template.
 impl publicafides::Config for Runtime {
 	type Event = Event;
@@ -310,7 +329,8 @@ construct_runtime! {
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
 		// Include the custom logic from the publicafides in the runtime.
 		PublicaFides: publicafides::{Pallet, Call, Storage, Event<T>},
-		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>}
+		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
+		Panel: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>}
 	}
 }
 
