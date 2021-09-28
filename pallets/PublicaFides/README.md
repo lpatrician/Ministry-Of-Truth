@@ -18,13 +18,13 @@ The pallet should be integrated into a runtime that includes other governing log
 #### How would it be used? ####
  The usage of the system can be described through the following flow:
 1. The user enters the app UI (imagine in this case there exist a UI form specifically for this pallet).
-2. The user enters their article url into the form and submits it. The DOI is retrieved by the UI code or entered by the user.
-3. The UI sends a request to the node, requesting that the pallet store the article using the `store_article` extrinsic.
-4. This stores the article in a StorageMap, `ArticleStorage`, which is designated for content that is in MOT's peer-review process . The `claims` vec of this struct is initialized as empty.
+2. The user enters their content url into the form and submits it. The DOI is retrieved by the UI code or entered by the user.
+3. The UI sends a request to the node, requesting that the pallet store the content using the `store_content` extrinsic.
+4. This stores the content in a StorageMap, `ContentStorage`, which is designated for content that is in PF's peer-review process. The `claims` vec of this struct is initialized as empty.
 5. The content will now be shown in the UI, under a peer review page, along with any other content in the same `StorageMap`.
-6. These members can now participate in the claims-voting step in the process. They can identify an objective claim statement for a claim made by the article, and put it to vote by using the Claims UI. This part of the UI contains a form that raises a motion in the *Collective* pallet that proposes calling the MOT's *store_claim_for_article* extrinsic with: their objective claim statement, the article ID the claim was discovered in, and a boolean value indicating whether the claim is accepted/rejected as true or false.
+6. These members can now participate in the claims-voting step in the process. They can identify an objective claim statement for a claim made in the content, and put it to vote by using the Claims UI. This part of the UI contains a form that raises a motion in the *Collective* pallet that proposes calling the PF's *store_claim_for_content* extrinsic with: their objective claim statement, the content ID the claim was discovered in, and a boolean value indicating whether the claim is accepted/rejected as true or false.
 7. Other members can vote aye/nay on such claims. Aye = accepted objective claim. Nay = non-credible OR subjective claim. In the future, claims will further be split into two steps: 1. determining whether claims are objective, and 2. determining whether claims are true. This can be further split between different instances of collective, with randomized members.
-8. Following the close of a voting period for claims on an article, a score is given to the article, based on the ratio of accepted/rejected claims.
+8. Following the close of a voting period for claims on an content, a score is given to the article, based on the ratio of accepted/rejected claims.
 
 #### Goals #### 
 1. Provide a decentralized tool for improving media consensus
