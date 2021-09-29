@@ -306,6 +306,44 @@ impl pallet_collective::Config<PanelCollective> for Runtime {
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
 }
 
+parameter_types! {
+	pub const CommitteeMotionDuration: BlockNumber = 5 * DAYS;
+	pub const CommitteeMaxProposals: u32 = 2000;
+	pub const CommitteeMaxMembers: u32 = 20;
+}
+
+type CommitteeCollective = pallet_collective::Instance3;
+
+impl pallet_collective::Config<CommitteeCollective> for Runtime {
+	type Origin = Origin;
+	type Proposal = Call;
+	type Event = Event;
+	type MotionDuration = PanelMotionDuration;
+	type MaxProposals = PanelMaxProposals;
+	type MaxMembers = PanelMaxMembers;
+	type DefaultVote = pallet_collective::PrimeDefaultVote;
+	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
+	pub const BoardMotionDuration: BlockNumber = 2 * DAYS;
+	pub const BoardMaxProposals: u32 = 100;
+	pub const BoardMaxMembers: u32 = 8;
+}
+
+type BoardCollective = pallet_collective::Instance4;
+
+impl pallet_collective::Config<BoardCollective> for Runtime {
+	type Origin = Origin;
+	type Proposal = Call;
+	type Event = Event;
+	type MotionDuration = PanelMotionDuration;
+	type MaxProposals = PanelMaxProposals;
+	type MaxMembers = PanelMaxMembers;
+	type DefaultVote = pallet_collective::PrimeDefaultVote;
+	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
+}
+
 /// Configure the publicafides in pallets/template.
 impl publicafides::Config for Runtime {
 	type Event = Event;
@@ -330,7 +368,9 @@ construct_runtime! {
 		// Include the custom logic from the publicafides in the runtime.
 		PublicaFides: publicafides::{Pallet, Call, Storage, Event<T>},
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
-		Panel: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>}
+		Panel: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
+		Committee: pallet_collective::<Instance3>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
+		Board: pallet_collective::<Instance4>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>},
 	}
 }
 
