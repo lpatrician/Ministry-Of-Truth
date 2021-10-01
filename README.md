@@ -1,7 +1,7 @@
-# MOT Node  🏢 #
+# Publica Fides Node 🤝 #
 
 ## Background ##
-This houses the MOT pallet. For more background on the project, see `pallets/publicafides/README.md`
+This houses the Publica Fides pallet. For more background on the project, see `pallets/publicafides/README.md`
 
 ## Development ##
 To build the project, run:
@@ -22,7 +22,3 @@ cargo fmt
 ```shell
 cargo test
 ```
-
-#### TODO ####
-- Finish benchmarking and finalize weights.
-- TODOs for publicafides pallet
