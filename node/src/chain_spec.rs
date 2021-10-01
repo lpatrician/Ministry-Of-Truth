@@ -1,5 +1,5 @@
 use node_template_runtime::{
-	AccountId, AuraConfig, BalancesConfig, CouncilConfig, PanelConfig, GenesisConfig, GrandpaConfig, Signature,
+	AccountId, AuraConfig, BalancesConfig, CouncilConfig, PanelConfig, CommitteeConfig, BoardConfig, GenesisConfig, GrandpaConfig, Signature,
 	SudoConfig, SystemConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
@@ -160,6 +160,20 @@ fn testnet_genesis(
 			phantom: Default::default(),
 		},
 		panel: PanelConfig {
+			members: vec![
+				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+			],
+			phantom: Default::default(),
+		},
+		committee: CommitteeConfig {
+			members: vec![
+				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+			],
+			phantom: Default::default(),
+		},
+		board: BoardConfig {
 			members: vec![
 				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
 				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
