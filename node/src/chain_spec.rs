@@ -154,29 +154,37 @@ fn testnet_genesis(
 		},
 		council: CouncilConfig {
 			members: vec![
-				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				// Account: Thor
+				hex!["a4da2a0a8e911f7a7a1860d0c233ee36a34c815966811bbde3efd9e279317807"].into(),
+				// Account: Ezekiel
+				hex!["66c4fef31847412b9d7e4b3885ba9fe02659ddf86df0bed6dff6b605605e9203"].into(),
 			],
 			phantom: Default::default(),
 		},
 		panel: PanelConfig {
 			members: vec![
-				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				// Account: Jeremiah
+				hex!["9c344c75bbf594b662a58d4c64181d2d01c937ea1f1c4e1b305069c844f4f644"].into(),
+				// Account: Carlos
+				hex!["6a18b5185e177e1f70e11901d5cb863f9ef756ef3bab56a48d47d7738611b808"].into(),
 			],
 			phantom: Default::default(),
 		},
 		committee: CommitteeConfig {
 			members: vec![
-				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				// Account: Tyrell
+				hex!["a6486e313a0d692c409ef2e87272e7a1637e030e4582313130e75ea7a3d67c0f"].into(),
+				// Account: Marian
+				hex!["2a6dda91b70e6b2f5689daa67d95d6c6ddea44e12e9c9d98d40c3daafdced87b"].into(),
 			],
 			phantom: Default::default(),
 		},
 		board: BoardConfig {
 			members: vec![
-				hex!["74505259581940376e389205a4519f269dd614e2d8b052a4b5f3a7597a61122d"].into(),
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				// Account: Yakub
+				hex!["22985b1ff6a62eefe92ad24b88c56b98e30826280afc11fa3ab39a2cf5b3c122"].into(),
+				// Account: Dmitri
+				hex!["56f94a1d064359749a92538abffa409c02c3c3e4e357ea802b005a709794864b"].into(),
 			],
 			phantom: Default::default(),
 		},
