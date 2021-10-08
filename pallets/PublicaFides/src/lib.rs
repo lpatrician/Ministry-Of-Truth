@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub use pallet::*;
+pub use frame_system::pallet::*;
 
 #[cfg(test)]
 mod mock;
@@ -10,6 +10,8 @@ mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
+mod util;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -46,6 +48,8 @@ pub mod pallet {
 		url: Vec<u8>,
 		/// u32s representing ids of any Claims raised in the Content
 		claims: Vec<u32>,
+		/// u8 representing the calculated score for each piece of content
+		score: Vec<u8>
 	}
 
 	#[pallet::storage]
@@ -62,8 +66,17 @@ pub mod pallet {
 	#[pallet::getter(fn next_claim_id)]
 	pub type NextClaimId<T: Config> = StorageValue<_, ClaimId, ValueQuery>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn next_resolved_claim_id)]
+	pub type NextResolvedClaimID<T: Config> = StorageValue<_, ResolvedClaim, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn get_final_claims)]
+	pub type FinalClaimStorage<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::ContentId, ResolvedClaim, ValueQuery>;
+
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
-	/// Claims made in scientific articles. Proposers can introduce claims as accepted or rejected to reflect the veracity of the content.
+	/// Claims made in proposed content. Proposers can introduce claims as accepted or rejected to reflect the veracity of the content.
 	pub struct Claim {
 		/// the IPFS CID of the text that contains the objective claim statement.
 		pub claim_text_cid: Vec<u8>,
@@ -71,9 +84,18 @@ pub mod pallet {
 		pub is_accepted: bool,
 	}
 
+	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
+	// Claims that have been verified as objective and judged to be true or false
+	pub struct ResolvedClaim {
+		/// the resolved claim id
+		pub claim_id: Vec<u8>,
+		/// result of the vote on truthiness
+		pub is_accepted: bool,
+	}
+
 	#[pallet::storage]
 	#[pallet::getter(fn get_claims)]
-	/// Double Storage map that maps claims to the articles they originated from
+	// Double Storage map that maps claims to the articles they originated from
 	pub type ClaimsToContent<T: Config> = StorageDoubleMap<
 		_,
 		Blake2_128Concat,
@@ -90,6 +112,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ContentStored(T::ContentId),
 		ClaimStored(ClaimId),
+		ScoreStored(score),
 	}
 
 	#[pallet::error]
@@ -97,6 +120,24 @@ pub mod pallet {
 		NoAvailableContentId,
 		NoAvailableClaimId,
 		NonExistentContent
+	}
+
+pub fn truth_from_content(_: Content) {
+	// Initializes a temporary claim_id until prior logic is worked out
+	let temp_claim_id = 1;
+	// Get vector of boolean values from content
+	let mut final_claims = get_final_claims(temp_claim_id);
+	// Calculate score using final_claims and content_scoring function imported from util.rs
+	let calculated_score = content_scoring(final_claims);
+
+	ContentStorage::<T>::try_mutate_exists((Self: score).clone(), |val| -> DispatchResult {
+		// add calculated_score to content for future reference
+		let content = val.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
+		content.score.push(calculated_score);
+		Self::deposit_event(Event::ScoreStored(calculated_score));
+		Ok(())
+	});
+
 	}
 
 	#[pallet::call]
@@ -120,7 +161,7 @@ pub mod pallet {
 					Ok(current_id)
 				})?;
 
-			let content = Content { url, claims : [].to_vec() };
+			let content = Content { url, claims, score : [].to_vec() };
 			ContentStorage::<T>::insert(class_id.clone(), content);
 			Self::deposit_event(Event::ContentStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
@@ -149,6 +190,14 @@ pub mod pallet {
 
 			let new_claim_id =
 				NextClaimId::<T>::try_mutate(|claim_id| -> Result<ClaimId, DispatchError> {
+					let current_id = *claim_id;
+					*claim_id =
+						claim_id.checked_add(One::one()).ok_or(Error::<T>::NoAvailableClaimId)?;
+					Ok(current_id)
+				})?;
+			
+			let new_resolved_claim_id =
+				NextResolvedClaimID::<T>::try_mutate(|claim_id| -> Result<ClaimId, DispatchError> {
 					let current_id = *claim_id;
 					*claim_id =
 						claim_id.checked_add(One::one()).ok_or(Error::<T>::NoAvailableClaimId)?;
