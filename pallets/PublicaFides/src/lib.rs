@@ -11,7 +11,7 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-mod util;
+mod helper;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -22,7 +22,7 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use sp_std::vec::Vec;
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One};
-	
+	pub use crate::helper::content_scoring;
 	
 	
 	#[pallet::config]
@@ -49,7 +49,7 @@ pub mod pallet {
 		/// u32s representing ids of any Claims raised in the Content
 		claims: Vec<u32>,
 		/// u8 representing the calculated score for each piece of content
-		score: Vec<u8>
+		score: u8,
 	}
 
 	#[pallet::storage]
@@ -68,7 +68,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn next_resolved_claim_id)]
-	pub type NextResolvedClaimID<T: Config> = StorageValue<_, ResolvedClaim, ValueQuery>;
+	pub type NextResolvedClaimID<T: Config> = StorageValue<_, ClaimId, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn get_final_claims)]
@@ -112,7 +112,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ContentStored(T::ContentId),
 		ClaimStored(ClaimId),
-		ScoreStored(score),
+		ScoreStored(u8),
 	}
 
 	#[pallet::error]
@@ -122,7 +122,7 @@ pub mod pallet {
 		NonExistentContent
 	}
 
-pub fn truth_from_content(_: Content) {
+pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 	// Initializes a temporary claim_id until prior logic is worked out
 	let temp_claim_id = 1;
 	// Get vector of boolean values from content
@@ -130,7 +130,8 @@ pub fn truth_from_content(_: Content) {
 	// Calculate score using final_claims and content_scoring function imported from util.rs
 	let calculated_score = content_scoring(final_claims);
 
-	ContentStorage::<T>::try_mutate_exists((Self: score).clone(), |val| -> DispatchResult {
+	// Pass in arbitrary/placeholder first content id
+	ContentStorage::<T>::try_mutate_exists(content_id, |val| -> DispatchResult {
 		// add calculated_score to content for future reference
 		let content = val.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
 		content.score.push(calculated_score);
@@ -161,7 +162,7 @@ pub fn truth_from_content(_: Content) {
 					Ok(current_id)
 				})?;
 
-			let content = Content { url, claims, score : [].to_vec() };
+			let content = Content { url, claims: [].to_vec(), score: 0 };
 			ContentStorage::<T>::insert(class_id.clone(), content);
 			Self::deposit_event(Event::ContentStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
