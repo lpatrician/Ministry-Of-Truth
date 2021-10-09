@@ -126,7 +126,7 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 	// Initializes a temporary claim_id until prior logic is worked out
 	let temp_claim_id = 1;
 	// Get vector of boolean values from content
-	let mut final_claims = get_final_claims(temp_claim_id);
+	let mut final_claims = get_claims(temp_claim_id);
 	// Calculate score using final_claims and content_scoring function imported from util.rs
 	let calculated_score = content_scoring(final_claims);
 
@@ -134,8 +134,9 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 	ContentStorage::<T>::try_mutate_exists(content_id, |val| -> DispatchResult {
 		// add calculated_score to content for future reference
 		let content = val.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
-		content.score.push(calculated_score);
-		Self::deposit_event(Event::ScoreStored(calculated_score));
+		let score = calculated_score;
+		let score = score as u8;
+		Self::deposit_event(Event::ScoreStored(score));
 		Ok(())
 	});
 
