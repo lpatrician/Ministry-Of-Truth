@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub use frame_system::pallet::*;
+pub use pallet::*;
 
 #[cfg(test)]
 mod mock;
@@ -22,14 +22,14 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use sp_std::vec::Vec;
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One};
-	pub use crate::helper::content_scoring;
-	
+	use substrate_fixed::types::U32F32;
+	pub use crate::helper::score_claims;
 	
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 		/// Id of content stored in the system
-		type  ContentId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
+		type ContentId: Parameter + Member + AtLeast32BitUnsigned + Default + Copy;
 	}
 	
 	/// Id of claims made in the system.
@@ -40,16 +40,15 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 	
 	
-
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
 	/// Represents content in the system.
 	pub struct Content {
 		/// The URL designated for accessing the Content
 		url: Vec<u8>,
-		/// u32s representing ids of any Claims raised in the Content
-		claims: Vec<u32>,
-		/// u8 representing the calculated score for each piece of content
-		score: u8,
+		/// Claims raised in the Content and their vote result. Max 10
+		claims: Vec<Claim>,
+		/// Number in range of 0-1 representing the calculated score for each piece of content
+		score: U32F32
 	}
 
 	#[pallet::storage]
@@ -73,7 +72,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn get_final_claims)]
 	pub type FinalClaimStorage<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::ContentId, ResolvedClaim, ValueQuery>;
+		StorageMap<_, Blake2_128Concat, T::ContentId, ResolvedClaims, ValueQuery>;
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
 	/// Claims made in proposed content. Proposers can introduce claims as accepted or rejected to reflect the veracity of the content.
@@ -86,11 +85,8 @@ pub mod pallet {
 
 	#[derive(Encode, Decode, Default, Clone, Eq, PartialEq, RuntimeDebug)]
 	// Claims that have been verified as objective and judged to be true or false
-	pub struct ResolvedClaim {
-		/// the resolved claim id
-		pub claim_id: Vec<u8>,
-		/// result of the vote on truthiness
-		pub is_accepted: bool,
+	pub struct ResolvedClaims {
+		pub claims: Vec<Claim>
 	}
 
 	#[pallet::storage]
@@ -123,24 +119,18 @@ pub mod pallet {
 	}
 
 pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
-	// Initializes a temporary claim_id until prior logic is worked out
-	let temp_claim_id = 1;
-	// Get vector of boolean values from content
-	let mut final_claims = get_claims(temp_claim_id);
-	// Calculate score using final_claims and content_scoring function imported from util.rs
-	let calculated_score = content_scoring(final_claims);
-
-	// Pass in arbitrary/placeholder first content id
-	ContentStorage::<T>::try_mutate_exists(content_id, |val| -> DispatchResult {
-		// add calculated_score to content for future reference
-		let content = val.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
-		let score = calculated_score;
-		let score = score as u8;
-		Self::deposit_event(Event::ScoreStored(score));
+	// Get mutable stored content by its id
+	ContentStorage::<T>::try_mutate_exists(content_id, |query_result| -> DispatchResult {
+		let content = query_result.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
+		// get claims for the given piece of content
+		let claims = FinalClaimStorage::<T>::get(content_id);
+		// update score of that piece of content with the score
+		content.score = score_claims(claims);
+		// Todo: decide whether we want to send an event i.e. alert the sender about the result
+		// Pallet::<T>::deposit_event(Event::ScoreStored(yourscorehere));
 		Ok(())
 	});
-
-	}
+}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
@@ -163,7 +153,7 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 					Ok(current_id)
 				})?;
 
-			let content = Content { url, claims: [].to_vec(), score: 0 };
+			let content = Content { url, claims: [].to_vec(), score: U32F32::from_num(0) };
 			ContentStorage::<T>::insert(class_id.clone(), content);
 			Self::deposit_event(Event::ContentStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
@@ -206,16 +196,18 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 					Ok(current_id)
 				})?;
 
+			let this_claim = Claim { claim_text_cid: claim_statement, is_accepted };
+
 			ClaimsToContent::<T>::insert(
 				new_claim_id,
 				content_id.clone(),
-                Claim { claim_text_cid: claim_statement, is_accepted },
+                this_claim.clone(),
 			);
 
 			ContentStorage::<T>::try_mutate_exists(content_id.clone(), |val| -> DispatchResult {
 				// add claim id to content for future reference
 				let content = val.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
-				content.claims.push(new_claim_id);
+				content.claims.push(this_claim);
 				Self::deposit_event(Event::ClaimStored(new_claim_id));
 				Ok(())
 			});
