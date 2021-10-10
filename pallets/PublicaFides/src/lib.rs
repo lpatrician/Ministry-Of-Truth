@@ -122,10 +122,8 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 	// Get mutable stored content by its id
 	ContentStorage::<T>::try_mutate_exists(content_id, |query_result| -> DispatchResult {
 		let content = query_result.as_mut().ok_or(Error::<T>::NonExistentContent).unwrap();
-
 		// get claims for the given piece of content
 		let claims = FinalClaimStorage::<T>::get(content_id);
-
 		// update score of that piece of content with the score
 		content.score = score_claims(claims);
 		// Todo: decide whether we want to send an event i.e. alert the sender about the result
