@@ -45,7 +45,7 @@ pub mod pallet {
 	pub struct Content {
 		/// The URL designated for accessing the Content
 		url: Vec<u8>,
-		/// Vector of tuples representing ids of any Claims raised in the Content and their vote result. Max 10
+		/// Claims raised in the Content and their vote result. Max 10
 		claims: Vec<Claim>,
 		/// Number in range of 0-1 representing the calculated score for each piece of content
 		score: U32F32
