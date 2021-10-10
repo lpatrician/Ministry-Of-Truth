@@ -22,9 +22,8 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use sp_std::vec::Vec;
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One};
-	use sp_arithmetic::per_things::Permill;
+	use substrate_fixed::types::U32F32;
 	pub use crate::helper::score_claims;
-	
 	
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -49,7 +48,7 @@ pub mod pallet {
 		/// Vector of tuples representing ids of any Claims raised in the Content and their vote result. Max 10
 		claims: Vec<Claim>,
 		/// Number in range of 0-1 representing the calculated score for each piece of content
-		score: Permill
+		score: U32F32
 	}
 
 	#[pallet::storage]
@@ -156,7 +155,7 @@ pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 					Ok(current_id)
 				})?;
 
-			let content = Content { url, claims: [].to_vec(), score: Permill::zero() };
+			let content = Content { url, claims: [].to_vec(), score: U32F32::from_num(0) };
 			ContentStorage::<T>::insert(class_id.clone(), content);
 			Self::deposit_event(Event::ContentStored(class_id));
 			// Return a successful DispatchResultWithPostInfo
