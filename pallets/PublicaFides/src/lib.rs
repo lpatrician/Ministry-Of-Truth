@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub use frame_system::pallet::*;
+pub use pallet::*;
 
 #[cfg(test)]
 mod mock;
@@ -10,6 +10,8 @@ mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+
+mod helper;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -21,7 +23,7 @@ pub mod pallet {
 	use sp_std::vec::Vec;
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One};
 	use sp_arithmetic::per_things::Permill;
-	// pub use crate::helper::score_claims;
+	pub use crate::helper::score_claims;
 	
 	
 	#[pallet::config]
@@ -116,23 +118,6 @@ pub mod pallet {
 		NoAvailableClaimId,
 		NonExistentContent
 	}
-
-pub fn score_claims(claims: ResolvedClaims) -> Permill {
-	let mut true_count = Permill::zero();
-
-	let iter_true_claims = claims.claims.iter();
-
-	// claims should be max 10
-	for claim in iter_true_claims {
-		if claim.is_accepted == true {
-			// true_count = true_count + 1
-			true_count = true_count + Permill::one();
-		};
-	};
-	let total_claims = claims.claims.len() as u8;
-	
-	true_count / total_claims
-}
 
 pub fn truth_from_content<T: Config>(content_id: T::ContentId) {
 	// Get mutable stored content by its id
