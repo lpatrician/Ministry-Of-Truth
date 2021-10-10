@@ -3,9 +3,7 @@ use sp_arithmetic::{per_things::Permill};
 
 pub fn score_claims(claims: pallet::ResolvedClaims) -> Permill {
     let mut true_count = Permill::zero();
-
     let iter_true_claims = claims.claims.iter();
-
     // claims should be max 10
     for claim in iter_true_claims {
         if claim.is_accepted == true {
@@ -14,9 +12,5 @@ pub fn score_claims(claims: pallet::ResolvedClaims) -> Permill {
         };
     };
     let total_claims = claims.claims.len() as u8;
-    
     true_count / total_claims
-    // sp_arithmetic::PerThing::from_float(score as f64)
-    // PerThing::from_float(score as f64)
-    // Permill::
 }
