@@ -15,10 +15,7 @@ mod helper;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{
-		dispatch::{DispatchResult, EncodeLike},
-		pallet_prelude::*,
-	};
+	use frame_support::{Blake2_128Concat, StorageMap, dispatch::{DispatchResult, EncodeLike}, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use sp_std::vec::Vec;
 	use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, One};
@@ -64,6 +61,11 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn next_claim_id)]
 	pub type NextClaimId<T: Config> = StorageValue<_, ClaimId, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn get_objectivity)]
+	pub type ObjectivityStorage<T: Config> =
+		StorageMap<_, Blake2_128Concat, T::Claim, ClaimId, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn next_resolved_claim_id)]
